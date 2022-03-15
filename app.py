@@ -20,11 +20,16 @@ except KeyError as e:
 def get_devices():
     return requests.get(f"{base_uri}?access_token={access_token}")
 
+def get_all_devices():
+    return requests.get(f"{base_uri}/all?access_token={access_token}")
+
 @app.route("/info")
 def info():
+    result = get_devices()
     res = {
         "status": {
-            "CONNECTION": "ONLINE" if get_devices().status_code == 200 else "OFFLINE"
+            "CONNECTION": "ONLINE" if result.status_code == 200 else "OFFLINE",
+            "CODE": result.status_code
         },
         "config": {
             "HE_URI": base_uri,
@@ -41,39 +46,36 @@ def info():
 
 @app.route("/metrics")
 def metrics():
-    devices = get_devices()
+    devices = get_all_devices()
     device_attributes = []
-
     for device in devices.json():
-        device_details = requests.get(f"{base_uri}/{device['id']}?access_token={access_token}").json()
-        for attrib  in device_details['attributes']:
+        for attrib in device['attributes']:
+            value = device['attributes'][attrib]
             # Is this a metric we should be collecting?
-            if attrib["name"] in collected_metrics:
+            if attrib in collected_metrics:
                 # Does it have a "proper" value?
-                if attrib["currentValue"] is not None:
+                if value is not None:
                     # If it's a switch, then change from text to binary values
-                    if attrib["name"] == "switch":
-                        if attrib["currentValue"] == "on":
-                            attrib["currentValue"] = 1
+                    if attrib == "switch":
+                        if value  == "on":
+                            value = 1
                         else:
-                            attrib["currentValue"] = 0
-                    if attrib["name"] == "power":
-                        if attrib["currentValue"] == "on":
-                            attrib["currentValue"] = 1
-                        elif attrib["currentValue"] == "off":
-                            attrib["currentValue"] = 0
-                        else:
-                            attrib["currentValue"] = attrib["currentValue"]
+                            value  = 0
+                    if attrib == "power":
+                        if value  == "on":
+                            value  = 1
+                        elif value == "off":
+                            value = 0
 
                     # Sanitise the device name as it will appear in the label
-                    device_name = device_details['label'].lower().replace(' ','_').replace('-','_')
+                    device_name = device['label'].lower().replace(' ','_').replace('-','_')
                     # Sanitise the metric name 
-                    metric_name = attrib['name'].lower().replace(' ','_').replace('-','_')
+                    metric_name = attrib.lower().replace(' ','_').replace('-','_')
                     # Create the dict that holds the data
                     device_attributes.append({
                         "device_name": f"{device_name}",
                         "metric_name": f"{metric_name}",
-                        "metric_value": f"{attrib['currentValue']}",
+                        "metric_value": f"{value}",
                         "metric_timestamp": time.time()})
     # Create the response
     response = make_response(render_template('base.txt',
