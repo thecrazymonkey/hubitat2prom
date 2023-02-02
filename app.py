@@ -67,6 +67,11 @@ def metrics():
                                 value  = 1
                             elif value == "off":
                                 value = 0
+                        if attrib == "thermostat" or attrib == "thermostatOperatingState":
+                            if value  == "idle":
+                               value = 0
+                            else:
+                               value  = 1
 
                         # Sanitise the device name as it will appear in the label
                         device_name = device['label'].lower().replace(' ','_').replace('-','_')
