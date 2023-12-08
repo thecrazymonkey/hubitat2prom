@@ -3,12 +3,12 @@ entries:
   hubitat2prom:
   - apiVersion: v2
     appVersion: v5
-    created: "2023-12-08T14:50:05.541089-05:00"
+    created: "2023-12-08T15:51:25.167705-05:00"
     description: A Helm chart for Kubernetes
-    digest: 32eb70ed7ef4c52dbddaeae72911bc4e2912307c8cb55a12c0f10e0b34c9a805
+    digest: 3351fdd8a65ac86a489bb095e8b0664207a873710dcf4675c5bc1c71d49a7d54
     name: hubitat2prom
     type: application
     urls:
     - hubitat2prom-0.1.0.tgz
     version: 0.1.0
-generated: "2023-12-08T14:50:05.540447-05:00"
+generated: "2023-12-08T15:51:25.167042-05:00"
