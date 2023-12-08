@@ -98,6 +98,6 @@ tolerations: []
 affinity: {}
 
 hubitat:
-  uri: http://hubitat_host_name/apps/api/39/devices
+  uri: http://hubitat.host.name/apps/api/39/devices
   token: token
   metrics: battery,humidity,illuminance,level,switch,temperature,power,energy,uptime,cpuPct,dbSize,freeMemory,thermostatOperatingState,carbonDioxide,radonShortTermAvg,pressure,voc
