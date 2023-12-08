@@ -2,6 +2,7 @@ import json
 import os
 import requests
 import time
+import re
 
 from flask import render_template, Flask, make_response, Response
 
@@ -72,17 +73,27 @@ def metrics():
                                value = 0
                             else:
                                value  = 1
-
-                        # Sanitise the device name as it will appear in the label
-                        device_name = device['label'].lower().replace(' ','_').replace('-','_')
-                        # Sanitise the metric name 
-                        metric_name = attrib.lower().replace(' ','_').replace('-','_')
-                        # Create the dict that holds the data
+                        if attrib == "water":
+                            if value == "dry":
+                                value = 1
+                            else:
+                                value = 0
+                        # Sanitize to allow Prometheus Ingestion
+                        device_name = sanitize(device['name'])
+                        device_label = sanitize(device['label'])
+                        device_human_label = device['label']
+                        device_type = sanitize(device['type'])
+                        device_id = sanitize(device['id'])
+                        metric_name = sanitize(attrib)
                         device_attributes.append({
                             "device_name": f"{device_name}",
+                            "device_label": f"{device_label}",
+                            "device_human_label": f"{device_human_label}",
+                            "device_type": f"{device_type}",
+                            "device_id": f"{device_id}",
                             "metric_name": f"{metric_name}",
                             "metric_value": f"{value}",
-                            "metric_timestamp": time.time()})
+                            "metric_timestamp": time.time()})                            
         # Create the response
         response = make_response(render_template('base.txt',
                 device_details=device_attributes
@@ -94,5 +105,6 @@ def metrics():
     return response
 
 
-
+def sanitize(inputValue):
+    return re.sub('[^a-z0-9]+', '_', inputValue.lower())
 
