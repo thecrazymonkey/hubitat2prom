@@ -54,16 +54,7 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          env:
-            - name: HE_METRICS
-              value: {{ .Values.hubitat.metrics }}
-            - name: HE_TOKEN
-              value: {{ .Values.hubitat.token }}
-            - name: HE_URI
-              value: {{ .Values.hubitat.uri }}
-            - name: TZ
-              value: {{ .Values.hubitat.tz | default "EST5EDT" }}
-      {{- with .Values.volumes }}
+       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
